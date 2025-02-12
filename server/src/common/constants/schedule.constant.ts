@@ -1,0 +1,3 @@
+export const SCHEDULE = {
+  REFRESH_STATISTICS: "REFRESH_STATISTICS",
+};
