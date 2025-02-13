@@ -7,8 +7,6 @@ import { AppService } from "./app.service";
 import configuration from "./config/configuration";
 import { DatabaseConfig } from "./config/configuration.interface";
 import { LoggerMiddleware } from "./middlewares/logger.middleware";
-import { UploadFileModule } from "./modules/uploadfile/uploadfile.module";
-
 @Module({
   imports: [
     ConfigModule.forRoot({ load: [configuration], isGlobal: true }),
@@ -18,7 +16,6 @@ import { UploadFileModule } from "./modules/uploadfile/uploadfile.module";
       inject: [ConfigService],
     }),
     TerminusModule,
-    UploadFileModule,
   ],
   controllers: [AppController],
   providers: [AppService],
