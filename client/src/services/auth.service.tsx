@@ -79,12 +79,12 @@ const authService = {
             console.log("🔍 Gửi access_token xuống Backend để xác thực...");
     
             const response = await axios.post(
+
                 `http://localhost:3001/api/auth/verify-token`, 
                 { access_token: token },
                 { headers: { "Content-Type": "application/json" } }
             );
-            
-    
+           
             console.log("✅ Token hợp lệ! Thông tin user từ BE:", response.data);
             return response.data;
         } catch (error) {
