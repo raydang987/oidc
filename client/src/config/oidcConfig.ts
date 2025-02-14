@@ -6,7 +6,7 @@ const oidcConfig = {
     redirect_uri: "http://localhost:5173/callback", // URL callback sau khi đăng nhập thành công
     response_type: "code",
     scope: "openid", // Các quyền truy cập
-    post_logout_redirect_uri: "", // URL sau khi logout
+    post_logout_redirect_uri: "http://localhost:5173/login", // URL sau khi logout
     stateStore: new WebStorageStateStore({ store: window.localStorage }), // Lưu state vào localStorage
 };
 
