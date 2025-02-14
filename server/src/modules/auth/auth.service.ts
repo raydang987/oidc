@@ -1,32 +1,46 @@
-import { Injectable } from "@nestjs/common";
-import { HttpService } from "@nestjs/axios";
-import { ConfigService } from "@nestjs/config";
+import { jwtDecode } from "jwt-decode";
+import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
+import axios from "axios";
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly configService: ConfigService
-  ) {}
+  private readonly OIDC_TOKEN_URL = "https://id2.tris.vn/connect/token";
+  private readonly OIDC_USERINFO_URL = "https://id2.tris.vn/connect/userinfo";
 
-  async exchangeCodeForToken(code: string, redirectUri: string) {
-    const clientId = this.configService.get<string>("OIDC_CLIENT_ID"); // "oidcId"
-    const tokenUrl = "https://id2.tris.vn/token";
+  async verifyToken(access_token: string) {
+    console.log("token: ", access_token);
+    if (!access_token) {
+      console.error("❌ Không có token được gửi lên!");
+      throw new HttpException("Token không hợp lệ", HttpStatus.UNAUTHORIZED);
+    }
 
-    const payload = {
-      code,
-      redirect_uri: redirectUri,
-      client_id: clientId,
-    };
-
+    // ✅ Giải mã token mà không cần verify
     try {
-      const response = await this.httpService.axiosRef.post(tokenUrl, payload, {
-        headers: { "Content-Type": "application/json" },
+      const decoded = jwtDecode(access_token);
+      console.log("🔑 Token decoded:", decoded);
+    } catch (error) {
+      console.error("❌ Token không hợp lệ khi decode:", error);
+      throw new HttpException("Token không hợp lệ", HttpStatus.UNAUTHORIZED);
+    }
+
+    // ✅ Gửi token lên OIDC server để kiểm tra tính hợp lệ
+    try {
+      const response = await axios.get(this.OIDC_USERINFO_URL, {
+        headers: { Authorization: `Bearer ${access_token}` },
       });
 
-      return response.data; // Trả về access token cho frontend
+      console.log("✅ Token hợp lệ! Thông tin user:", response.data);
+      return response.data;
     } catch (error) {
-      throw new Error("Lỗi trao đổi mã lấy token: " + error.message);
+      console.error(
+        "❌ Token không hợp lệ hoặc đã hết hạn:",
+        error.response?.data || error
+      );
+
+      throw new HttpException(
+        "Token không hợp lệ hoặc đã hết hạn",
+        HttpStatus.UNAUTHORIZED
+      );
     }
   }
 }

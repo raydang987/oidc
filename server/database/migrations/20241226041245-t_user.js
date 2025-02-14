@@ -8,33 +8,29 @@ module.exports = {
         autoIncrement: true,
         allowNull: false,
       },
+      id_sub: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      name: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+      },
       username: {
         type: Sequelize.STRING(50),
-        allowNull: false,
-        unique: true,
+        allowNull: true,
       },
       password: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       email: {
         type: Sequelize.STRING(100),
-        allowNull: false,
-        unique: true,
+        allowNull: true,
       },
       sdt: {
         type: Sequelize.STRING(15),
         allowNull: true,
-      },
-      created_at: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
-      },
-      updated_at: {
-        type: Sequelize.DATE,
-        allowNull: false,
-        defaultValue: Sequelize.NOW,
       },
     });
   },

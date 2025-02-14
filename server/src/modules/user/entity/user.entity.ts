@@ -1,35 +1,49 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+} from "sequelize-typescript";
 
-@Table({
-  tableName: "t_user",
-  timestamps: false,
-})
+@Table({ tableName: "t_user", timestamps: false })
 export class User extends Model<User> {
+  @PrimaryKey
+  @AutoIncrement
   @Column({
     type: DataType.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
     allowNull: false,
   })
   id: number;
 
   @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  id_sub: number;
+
+  @Column({
     type: DataType.STRING(50),
-    allowNull: false,
-    unique: true,
+    allowNull: true,
+  })
+  name: string;
+
+  @Column({
+    type: DataType.STRING(50),
+    allowNull: true,
   })
   username: string;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: true,
   })
   password: string;
 
   @Column({
     type: DataType.STRING(100),
-    allowNull: false,
-    unique: true,
+    allowNull: true,
   })
   email: string;
 
@@ -38,10 +52,4 @@ export class User extends Model<User> {
     allowNull: true,
   })
   sdt: string;
-
-  @Column({ type: DataType.DATE })
-  created_at: Date;
-
-  @Column({ type: DataType.DATE })
-  updated_at: Date;
 }
