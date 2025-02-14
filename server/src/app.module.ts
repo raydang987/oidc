@@ -7,6 +7,7 @@ import { AppService } from "./app.service";
 import configuration from "./config/configuration";
 import { DatabaseConfig } from "./config/configuration.interface";
 import { LoggerMiddleware } from "./middlewares/logger.middleware";
+import { AuthModule } from "./modules/auth/auth.module";
 @Module({
   imports: [
     ConfigModule.forRoot({ load: [configuration], isGlobal: true }),
@@ -16,6 +17,7 @@ import { LoggerMiddleware } from "./middlewares/logger.middleware";
       inject: [ConfigService],
     }),
     TerminusModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
