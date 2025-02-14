@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import authService from "../services/auth.service";
-import "./LoginForm.scss"; // Import file SCSS
+import "./LoginForm.scss";
 
 const LoginForm: React.FC = () => {
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,7 +17,7 @@ const LoginForm: React.FC = () => {
       const success = await authService.loginWithAccount(account, password);
       if (success) {
         alert("Đăng nhập thành công!");
-        window.location.href = "/login-success"; 
+        window.location.href = "/dashboard";
       } else {
         setError("Tài khoản hoặc mật khẩu không chính xác.");
       }
@@ -28,18 +28,14 @@ const LoginForm: React.FC = () => {
     }
   };
 
-  // Xử lý đăng nhập qua OIDC (Tris)
   const handleTrisLogin = () => {
     authService.loginWithOIDC();
   };
 
-  // Xử lý callback sau khi đăng nhập với OIDC
   useEffect(() => {
     const handleCallback = async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get("code");
-      if (code) {
-        await authService.handleOIDCCallback(code);
+      if (window.location.pathname === "/callback") {
+        await authService.handleOIDCCallback();
       }
     };
     handleCallback();
@@ -49,26 +45,16 @@ const LoginForm: React.FC = () => {
     <form onSubmit={handleLogin} className="login-form">
       <h2 className="login-form__title">Đăng nhập</h2>
 
-      {error && <p className="login-form__error">{error}</p>} {/* Hiển thị lỗi nếu có */}
+      {error && <p className="login-form__error">{error}</p>}
 
       <div className="login-form__group">
         <label>Tài khoản</label>
-        <input
-          type="text"
-          value={account}
-          onChange={(e) => setAccount(e.target.value)}
-          required
-        />
+        <input type="text" value={account} onChange={(e) => setAccount(e.target.value)} required />
       </div>
 
       <div className="login-form__group">
         <label>Mật khẩu</label>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
       </div>
 
       <button type="submit" className="login-form__button login-form__button--primary" disabled={loading}>

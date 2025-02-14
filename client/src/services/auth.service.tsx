@@ -1,7 +1,7 @@
 import axios from "axios";
 
-const API_URL = "https://your-api.com/auth";
-
+const API_URL = "https://localhost/auth";
+import { userManager } from "../config/oidcConfig";
 const authService = {
     async loginWithAccount(account: string, password: string) {
         try {
@@ -42,34 +42,38 @@ const authService = {
             throw error;
         }
     },
-    loginWithOIDC() {
-        setTimeout(() => {
-            window.location.href = `https://id2.tris.vn/Account/Login?client_id=TrisDA.SPA&redirect_uri=${window.location.origin}/callback&response_type=code&scope=openid profile email`;
-        }, 3000); // Chờ
-
-    },
-
-    async handleOIDCCallback(code: string) {
+    async loginWithOIDC() {
         try {
-            const response = await axios.post(`${API_URL}/oidc-callback`, {
-                code,
-            });
-
-            if (response.data.success) {
-                localStorage.setItem("access_token", response.data.token);
+            await userManager.signinRedirect(); // Điều hướng đến trang đăng nhập OIDC
+        } catch (error) {
+            console.error("Lỗi đăng nhập OIDC:", error);
+        }
+    },
+    async handleOIDCCallback() {
+        try {
+            const user = await userManager.signinRedirectCallback(); // Xử lý callback sau khi login
+            if (user && user.access_token) {
+                localStorage.setItem("access_token", user.access_token);
                 return true;
-            } else {
-                throw new Error("Lỗi xác thực OIDC.");
             }
+            return false;
         } catch (error) {
             console.error("Lỗi xử lý callback OIDC:", error);
             return false;
         }
     },
 
-    logout() {
-        localStorage.removeItem("access_token");
-        window.location.href = "/login";
+
+    async logout() {
+        try {
+            await userManager.signoutRedirect(); // Điều hướng đến trang đăng xuất OIDC
+            localStorage.removeItem("access_token");
+        } catch (error) {
+            console.error("Lỗi đăng xuất OIDC:", error);
+        }
+    },
+    async getUser() {
+        return await userManager.getUser(); // Lấy thông tin người dùng hiện tại
     },
 };
 
