@@ -23,10 +23,14 @@ const authService = {
     },
     async exchangeCodeForToken(code: string) {
         try {
-            const response = await fetch("https://your-backend.com/api/auth/oidc", {
+            const response = await fetch("https://id2.tris.vn/token", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ code, redirect_uri: window.location.origin + "/callback" }),
+                body: JSON.stringify({
+                    code, // Authorization Code từ URL
+                    redirect_uri: window.location.origin + "/callback", // Phải khớp với giá trị đã đăng ký
+                    client_id: "oidcId",
+                }),
             });
 
             const data = await response.json();

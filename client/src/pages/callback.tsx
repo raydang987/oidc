@@ -12,10 +12,13 @@ const Callback: React.FC = () => {
       const code = urlParams.get("code");
       console.log("OIDC Redirect Code:", code); // Kiểm tra code có tồn tại không
       if (code) {
-
-        navigate("/login-success");
-        await authService.exchangeCodeForToken(code);
-
+        try {
+          navigate("/login-success");
+          await authService.exchangeCodeForToken(code);
+        } catch (error) {
+          console.error("Lỗi xử lý OIDC:", error);
+          navigate("/login");
+        }
       } else {
         navigate("/login");
       }
