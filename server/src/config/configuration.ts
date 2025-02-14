@@ -1,10 +1,6 @@
 import { Dialect } from "sequelize";
 import { sequelizeLogger } from "src/common/sequelize-logger";
-import {
-  AppConfig,
-  DatabaseConfig,
-  MinioConfig,
-} from "./configuration.interface";
+import { AppConfig, DatabaseConfig } from "./configuration.interface";
 
 export default () => {
   const app: AppConfig = {
@@ -31,20 +27,12 @@ export default () => {
     autoLoadModels: true,
     synchronize: false,
   };
-  const minio: MinioConfig = {
-    endpoint: process.env.MINIO_ENDPOINT,
-    useSSL: process.env.MINIO_USE_SSL === "true",
-    accessKeyId: process.env.MINIO_ROOT_USER,
-    secretAccessKey: process.env.MINIO_ROOT_PASSWORD,
-    port: +process.env.MINIO_PORT || 9000,
-    bucket: process.env.MINIO_BUCKET_NAME,
-  };
+
   const timeOtpExpire: number = parseInt(process.env.TIME_OTP_EXPIRE) || 3600;
 
   return {
     app: app,
     database: database,
     timeOtpExpire: timeOtpExpire,
-    minio: minio,
   };
 };

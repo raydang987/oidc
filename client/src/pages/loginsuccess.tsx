@@ -1,14 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../services/auth.service";
-import "./LoginSuccess.scss"; // Import file CSS nếu có
+import "./LoginSuccess.scss";
 
 const LoginSuccess: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
     authService.logout();
-    navigate("/"); // Điều hướng về trang đăng nhập
+    navigate("/login");
   };
 
   return (

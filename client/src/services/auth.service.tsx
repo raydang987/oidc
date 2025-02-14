@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://localhost/auth";
+const API_URL = "https://localhost:3001/auth";
 import { userManager } from "../config/oidcConfig";
 const authService = {
     async loginWithAccount(account: string, password: string) {
@@ -48,7 +48,7 @@ const authService = {
                     redirect_uri: window.location.origin + "/callback",
                     client_id: "oidcId",
                     code_verifier: codeVerifier, 
-                    scope: "openid",
+                    scope: "openid profile email",
                 }),
                 { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
             );
@@ -79,11 +79,12 @@ const authService = {
             console.log("🔍 Gửi access_token xuống Backend để xác thực...");
     
             const response = await axios.post(
-                `https://your-backend.com/api/auth/verify-token`, 
-                { token }, 
+
+                `http://localhost:3001/api/auth/verify-token`, 
+                { access_token: token },
                 { headers: { "Content-Type": "application/json" } }
             );
-    
+           
             console.log("✅ Token hợp lệ! Thông tin user từ BE:", response.data);
             return response.data;
         } catch (error) {
