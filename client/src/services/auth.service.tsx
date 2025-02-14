@@ -20,35 +20,80 @@ const authService = {
             console.error("Lỗi đăng nhập:", error);
             return false;
         }
-    },
-    async exchangeCodeForToken(code: string) {
+    }, async exchangeCodeForToken(code: string) {
         try {
-            const response = await fetch("https://id2.tris.vn/token", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    code, // Authorization Code từ URL
-                    redirect_uri: window.location.origin + "/callback", // Phải khớp với giá trị đã đăng ký
-                    client_id: "oidcId",
-                }),
-            });
+            console.log("🔄 Đang trao đổi mã lấy access token...");
 
-            const data = await response.json();
-
-            if (data.token) {
-                localStorage.setItem("token", data.token); // Lưu token vào localStorage
-                return true;
+            let codeVerifier = "";
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith("oidc.")) {
+                    const data = JSON.parse(localStorage.getItem(key) || "{}");
+                    if (data.code_verifier) {
+                        codeVerifier = data.code_verifier;
+                        break;
+                    }
+                }
             }
 
-            throw new Error("Không lấy được token!");
+            console.log("📝 Code Verifier lấy được:", codeVerifier);
+
+            if (!codeVerifier) throw new Error("Không tìm thấy code_verifier!");
+
+            const response = await axios.post(
+                `https://id2.tris.vn/connect/token`,
+                new URLSearchParams({
+                    grant_type: "authorization_code",
+                    code: code,
+                    redirect_uri: window.location.origin + "/callback",
+                    client_id: "oidcId",
+                    code_verifier: codeVerifier, 
+                    scope: "openid",
+                }),
+                { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+            );
+
+            if (response.data.access_token) {
+                localStorage.setItem("access_token", response.data.access_token);
+                localStorage.setItem("authority", "https://id2.tris.vn");
+                localStorage.setItem("client_id", "oidcId");
+                localStorage.setItem("redirect_uri", window.location.origin + "/callback");
+                localStorage.setItem("scope", "openid profile email");
+
+                console.log("✅ Access Token nhận được:", response.data.access_token);
+
+                const userInfo = await authService.verifyToken(response.data.access_token);
+
+                return userInfo; 
+            }
+
+            throw new Error(response.data.error_description || "Không lấy được token!");
         } catch (error) {
-            console.error("Lỗi trao đổi mã:", error);
+            console.error("❌ Lỗi trao đổi mã:", error);
+            throw error;
+        }
+    }
+    ,
+    async verifyToken(token: string) {
+        try {
+            console.log("🔍 Gửi access_token xuống Backend để xác thực...");
+    
+            const response = await axios.post(
+                `https://your-backend.com/api/auth/verify-token`, 
+                { token }, 
+                { headers: { "Content-Type": "application/json" } }
+            );
+    
+            console.log("✅ Token hợp lệ! Thông tin user từ BE:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("❌ Token không hợp lệ hoặc đã hết hạn:", error);
             throw error;
         }
     },
     async loginWithOIDC() {
         try {
-            await userManager.signinRedirect(); // Điều hướng đến trang đăng nhập OIDC
+            await userManager.signinRedirect();
         } catch (error) {
             console.error("Lỗi đăng nhập OIDC:", error);
         }
@@ -79,6 +124,8 @@ const authService = {
     async getUser() {
         return await userManager.getUser(); // Lấy thông tin người dùng hiện tại
     },
+
+
 };
 
 export default authService;
