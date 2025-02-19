@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import authService from "../services/auth.service";
 import "./LoginForm.scss";
-
+import { useNavigate } from "react-router-dom";
 const LoginForm: React.FC = () => {
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
+  const navigate = useNavigate();
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -17,7 +17,7 @@ const LoginForm: React.FC = () => {
       const success = await authService.loginWithAccount(account, password);
       if (success) {
         alert("Đăng nhập thành công!");
-        window.location.href = "/dashboard";
+        window.location.href = "/login-success";
       } else {
         setError("Tài khoản hoặc mật khẩu không chính xác.");
       }
@@ -31,7 +31,9 @@ const LoginForm: React.FC = () => {
   const handleTrisLogin = () => {
     authService.loginWithOIDC();
   };
-
+  const handleRegister = () => {
+    navigate("/register"); // Điều hướng đến trang đăng ký
+  };
   useEffect(() => {
     const handleCallback = async () => {
       if (window.location.pathname === "/callback") {
@@ -63,6 +65,10 @@ const LoginForm: React.FC = () => {
 
       <button type="button" onClick={handleTrisLogin} className="login-form__button login-form__button--secondary">
         Đăng nhập qua Tris
+      </button>
+
+      <button type="button" onClick={handleRegister} className="login-form__button login-form__button--tertiary">
+        Đăng ký
       </button>
     </form>
   );

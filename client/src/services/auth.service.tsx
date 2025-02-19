@@ -47,7 +47,7 @@ const authService = {
                     code: code,
                     redirect_uri: window.location.origin + "/callback",
                     client_id: "oidcId",
-                    code_verifier: codeVerifier, 
+                    code_verifier: codeVerifier,
                     scope: "openid profile email",
                 }),
                 { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
@@ -64,7 +64,7 @@ const authService = {
 
                 const userInfo = await authService.verifyToken(response.data.access_token);
 
-                return userInfo; 
+                return userInfo;
             }
 
             throw new Error(response.data.error_description || "Không lấy được token!");
@@ -77,14 +77,14 @@ const authService = {
     async verifyToken(token: string) {
         try {
             console.log("🔍 Gửi access_token xuống Backend để xác thực...");
-    
+
             const response = await axios.post(
 
-                `http://localhost:3001/api/auth/verify-token`, 
+                `http://localhost:3001/api/auth/verify-token`,
                 { access_token: token },
                 { headers: { "Content-Type": "application/json" } }
             );
-           
+
             console.log("✅ Token hợp lệ! Thông tin user từ BE:", response.data);
             return response.data;
         } catch (error) {
@@ -117,7 +117,7 @@ const authService = {
     async logout() {
         try {
             await userManager.signoutRedirect(); // Điều hướng đến trang đăng xuất OIDC
-            localStorage.removeItem("access_token");
+            localStorage.clear();
         } catch (error) {
             console.error("Lỗi đăng xuất OIDC:", error);
         }
@@ -125,8 +125,26 @@ const authService = {
     async getUser() {
         return await userManager.getUser(); // Lấy thông tin người dùng hiện tại
     },
-
-
+    async register(userData: { account: string; email: string; password: string }) {
+        try {
+          const response = await fetch(`${API_URL}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData),
+          });
+    
+          const data = await response.json(); // Lấy dữ liệu phản hồi từ server
+    
+          if (!response.ok) {
+            throw new Error(data.message || "Đăng ký thất bại!");
+          }
+    
+          return data; // Trả về dữ liệu từ server nếu đăng ký thành công
+        } catch (error: any) {
+          console.error("Lỗi đăng ký:", error.message);
+          throw new Error(error.message || "Lỗi hệ thống! Vui lòng thử lại.");
+        }
+      },
 };
 
 export default authService;
