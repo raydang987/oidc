@@ -101,7 +101,7 @@ const authService = {
     },
     async handleOIDCCallback() {
         try {
-            const user = await userManager.signinRedirectCallback(); // Xử lý callback sau khi login
+            const user = await userManager.signinRedirectCallback(); 
             if (user && user.access_token) {
                 localStorage.setItem("access_token", user.access_token);
                 return true;
@@ -116,8 +116,9 @@ const authService = {
 
     async logout() {
         try {
-            await userManager.signoutRedirect(); // Điều hướng đến trang đăng xuất OIDC
-            localStorage.removeItem("access_token");
+             await userManager.signoutRedirect(); // Điều hướng đến trang đăng xuất OIDC
+            localStorage.clear();
+            window.location.href = "http://localhost:5173/login";
         } catch (error) {
             console.error("Lỗi đăng xuất OIDC:", error);
         }
