@@ -1,5 +1,5 @@
 {
-  "name": "admin-ecdd-core",
+  "name": "oidc-server",
   "version": "1.0.0",
   "description": "",
   "author": "Nguyễn Hồng Đức",
@@ -39,6 +39,8 @@
     "cron": "^3.1.7",
     "dotenv": "^16.4.5",
     "install": "^0.13.0",
+    "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "minio": "^8.0.4",
     "moment-timezone": "^0.5.45",
     "npm": "^10.9.0",

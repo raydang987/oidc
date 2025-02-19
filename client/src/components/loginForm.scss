@@ -80,4 +80,23 @@
       }
     }
   }
+  .login-form__button--tertiary {
+    background-color: #ffc107; // Màu vàng
+    color: #333; // Màu chữ tối hơn để dễ đọc
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+  
+    &:hover {
+      background-color: #e0a800; // Màu vàng đậm hơn khi hover
+    }
+  
+    &:active {
+      background-color: #d39e00; // Màu vàng đậm hơn khi click
+    }
+  }
   

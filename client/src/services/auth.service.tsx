@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://localhost/auth";
+const API_URL = "https://localhost:3001/auth";
 import { userManager } from "../config/oidcConfig";
 const authService = {
     async loginWithAccount(account: string, password: string) {
@@ -48,7 +48,7 @@ const authService = {
                     redirect_uri: window.location.origin + "/callback",
                     client_id: "oidcId",
                     code_verifier: codeVerifier,
-                    scope: "openid",
+                    scope: "openid profile email",
                 }),
                 { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
             );
@@ -76,36 +76,22 @@ const authService = {
     ,
     async verifyToken(token: string) {
         try {
-            console.log("🔍 Đang xác thực access_token...");
-
-            const response = await axios.get(`https://id2.tris.vn/connect/userinfo`, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-
-            console.log("✅ Token hợp lệ! Thông tin user:", response.data);
-            return response.data;
-        } catch (error) {
-            console.error("❌ Token không hợp lệ hoặc đã hết hạn:", error);
-            throw error;
-        }
-    },
-    /**   async verifyToken(token: string) {
-        try {
             console.log("🔍 Gửi access_token xuống Backend để xác thực...");
-    
+
             const response = await axios.post(
-                `https://your-backend.com/api/auth/verify-token`, 
-                { token }, 
+
+                `http://localhost:3001/api/auth/verify-token`,
+                { access_token: token },
                 { headers: { "Content-Type": "application/json" } }
             );
-    
+
             console.log("✅ Token hợp lệ! Thông tin user từ BE:", response.data);
             return response.data;
         } catch (error) {
             console.error("❌ Token không hợp lệ hoặc đã hết hạn:", error);
             throw error;
         }
-    }, */
+    },
     async loginWithOIDC() {
         try {
             await userManager.signinRedirect();
@@ -131,7 +117,7 @@ const authService = {
     async logout() {
         try {
             await userManager.signoutRedirect(); // Điều hướng đến trang đăng xuất OIDC
-            localStorage.clear();;
+            localStorage.clear();
         } catch (error) {
             console.error("Lỗi đăng xuất OIDC:", error);
         }
@@ -139,8 +125,26 @@ const authService = {
     async getUser() {
         return await userManager.getUser(); // Lấy thông tin người dùng hiện tại
     },
-
-
+    async register(userData: { account: string; email: string; password: string }) {
+        try {
+          const response = await fetch(`${API_URL}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(userData),
+          });
+    
+          const data = await response.json(); // Lấy dữ liệu phản hồi từ server
+    
+          if (!response.ok) {
+            throw new Error(data.message || "Đăng ký thất bại!");
+          }
+    
+          return data; // Trả về dữ liệu từ server nếu đăng ký thành công
+        } catch (error: any) {
+          console.error("Lỗi đăng ký:", error.message);
+          throw new Error(error.message || "Lỗi hệ thống! Vui lòng thử lại.");
+        }
+      },
 };
 
 export default authService;

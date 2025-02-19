@@ -13,7 +13,6 @@ const Callback: React.FC = () => {
       console.log("OIDC Redirect Code:", code); // Kiểm tra code có tồn tại không
       if (code) {
         try {
-
           await authService.exchangeCodeForToken(code);
           navigate("/login-success");
         } catch (error) {
