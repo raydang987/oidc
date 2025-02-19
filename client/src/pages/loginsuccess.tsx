@@ -8,7 +8,6 @@ const LoginSuccess: React.FC = () => {
 
   const handleLogout = () => {
     authService.logout();
-    navigate("/"); // Điều hướng về trang đăng nhập
   };
 
   return (

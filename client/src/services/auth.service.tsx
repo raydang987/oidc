@@ -47,7 +47,7 @@ const authService = {
                     code: code,
                     redirect_uri: window.location.origin + "/callback",
                     client_id: "oidcId",
-                    code_verifier: codeVerifier, 
+                    code_verifier: codeVerifier,
                     scope: "openid",
                 }),
                 { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
@@ -64,7 +64,7 @@ const authService = {
 
                 const userInfo = await authService.verifyToken(response.data.access_token);
 
-                return userInfo; 
+                return userInfo;
             }
 
             throw new Error(response.data.error_description || "Không lấy được token!");
@@ -75,6 +75,21 @@ const authService = {
     }
     ,
     async verifyToken(token: string) {
+        try {
+            console.log("🔍 Đang xác thực access_token...");
+
+            const response = await axios.get(`https://id2.tris.vn/connect/userinfo`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            console.log("✅ Token hợp lệ! Thông tin user:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("❌ Token không hợp lệ hoặc đã hết hạn:", error);
+            throw error;
+        }
+    },
+    /**   async verifyToken(token: string) {
         try {
             console.log("🔍 Gửi access_token xuống Backend để xác thực...");
     
@@ -90,7 +105,7 @@ const authService = {
             console.error("❌ Token không hợp lệ hoặc đã hết hạn:", error);
             throw error;
         }
-    },
+    }, */
     async loginWithOIDC() {
         try {
             await userManager.signinRedirect();
@@ -116,7 +131,7 @@ const authService = {
     async logout() {
         try {
             await userManager.signoutRedirect(); // Điều hướng đến trang đăng xuất OIDC
-            localStorage.removeItem("access_token");
+            localStorage.clear();;
         } catch (error) {
             console.error("Lỗi đăng xuất OIDC:", error);
         }
