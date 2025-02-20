@@ -1,11 +1,15 @@
 import { jwtDecode } from "jwt-decode";
 import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
 import axios from "axios";
+import { User } from "../user/entity/user.entity";
+import { JwtService } from "@nestjs/jwt";
+import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class AuthService {
   private readonly OIDC_TOKEN_URL = "https://id2.tris.vn/connect/token";
   private readonly OIDC_USERINFO_URL = "https://id2.tris.vn/connect/userinfo";
+  constructor(private jwtService: JwtService) {}
 
   async verifyToken(access_token: string) {
     console.log("token: ", access_token);
@@ -14,7 +18,6 @@ export class AuthService {
       throw new HttpException("Token không hợp lệ", HttpStatus.UNAUTHORIZED);
     }
 
-    // ✅ Giải mã token mà không cần verify
     try {
       const decoded = jwtDecode(access_token);
       console.log("🔑 Token decoded:", decoded);
@@ -23,7 +26,6 @@ export class AuthService {
       throw new HttpException("Token không hợp lệ", HttpStatus.UNAUTHORIZED);
     }
 
-    // ✅ Gửi token lên OIDC server để kiểm tra tính hợp lệ
     try {
       const response = await axios.get(this.OIDC_USERINFO_URL, {
         headers: { Authorization: `Bearer ${access_token}` },
@@ -42,5 +44,21 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED
       );
     }
+  }
+
+  async generateJwt(user: User) {
+    const payload = { id: user.id, username: user.username };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+
+  async hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt(10);
+    return bcrypt.hash(password, salt);
+  }
+
+  async comparePasswords(plainPassword: string, hashedPassword: string) {
+    return bcrypt.compare(plainPassword, hashedPassword);
   }
 }

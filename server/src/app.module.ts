@@ -8,6 +8,8 @@ import configuration from "./config/configuration";
 import { DatabaseConfig } from "./config/configuration.interface";
 import { LoggerMiddleware } from "./middlewares/logger.middleware";
 import { AuthModule } from "./modules/auth/auth.module";
+import { UserController } from "./modules/user/user.controller";
+import { UserModule } from "./modules/user/user.module";
 @Module({
   imports: [
     ConfigModule.forRoot({ load: [configuration], isGlobal: true }),
@@ -18,8 +20,9 @@ import { AuthModule } from "./modules/auth/auth.module";
     }),
     TerminusModule,
     AuthModule,
+    UserModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, UserController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {
