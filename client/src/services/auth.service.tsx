@@ -101,7 +101,7 @@ const authService = {
     },
     async handleOIDCCallback() {
         try {
-            const user = await userManager.signinRedirectCallback(); // Xử lý callback sau khi login
+            const user = await userManager.signinRedirectCallback(); 
             if (user && user.access_token) {
                 localStorage.setItem("access_token", user.access_token);
                 return true;
@@ -127,7 +127,6 @@ const authService = {
                     .replace(/^ +/, "")
                     .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
             });
-
         } catch (error) {
             console.error("Lỗi đăng xuất OIDC:", error);
         }
