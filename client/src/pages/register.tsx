@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "../services/auth.service";
 import "./register.scss";
+import { userManager } from "../config/oidcConfig";
 
 const RegisterForm: React.FC = () => {
   const [account, setAccount] = useState("");
@@ -17,25 +18,28 @@ const RegisterForm: React.FC = () => {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError("Mật khẩu và xác nhận mật khẩu không khớp!");
-      return;
+        setError("Mật khẩu và xác nhận mật khẩu không khớp!");
+        return;
     }
 
     setLoading(true);
     try {
-      const success = await authService.register({ account, email, password });
-      if (success) {
-        alert("Đăng ký thành công! Vui lòng đăng nhập.");
-        navigate("/login"); // Chuyển hướng về trang đăng nhập
-      } else {
-        setError("Đăng ký không thành công. Vui lòng thử lại!");
-      }
+        const success = await authService.register({ account, email, password });
+        if (success) {
+            alert("Đăng ký thành công! Hệ thống sẽ đồng bộ với OIDC.");
+
+            // Chuyển hướng đăng nhập OIDC
+            await userManager.signinRedirect();
+        } else {
+            setError("Đăng ký không thành công. Vui lòng thử lại!");
+        }
     } catch (err: any) {
-      setError(err?.response?.data?.message || "Lỗi hệ thống! Vui lòng thử lại.");
+        setError(err?.response?.data?.message || "Lỗi hệ thống! Vui lòng thử lại.");
     } finally {
-      setLoading(false);
+        setLoading(false);
     }
-  };
+};
+
 
   return (
     <form onSubmit={handleRegister} className="register-form">
