@@ -116,8 +116,18 @@ const authService = {
 
     async logout() {
         try {
-            await userManager.signoutRedirect(); // Điều hướng đến trang đăng xuất OIDC
+            await userManager.signoutRedirect({ id_token_hint: (await userManager.getUser())?.access_token }); // Điều hướng đến trang đăng xuất OIDC
+            // Xóa tất cả dữ liệu cục bộ
             localStorage.clear();
+            sessionStorage.clear();
+
+            // Xóa toàn bộ cookies của trang hiện tại
+            document.cookie.split(";").forEach((cookie) => {
+                document.cookie = cookie
+                    .replace(/^ +/, "")
+                    .replace(/=.*/, `=;expires=${new Date(0).toUTCString()};path=/`);
+            });
+
         } catch (error) {
             console.error("Lỗi đăng xuất OIDC:", error);
         }
@@ -127,24 +137,24 @@ const authService = {
     },
     async register(userData: { account: string; email: string; password: string }) {
         try {
-          const response = await fetch(`${API_URL}/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(userData),
-          });
-    
-          const data = await response.json(); // Lấy dữ liệu phản hồi từ server
-    
-          if (!response.ok) {
-            throw new Error(data.message || "Đăng ký thất bại!");
-          }
-    
-          return data; // Trả về dữ liệu từ server nếu đăng ký thành công
+            const response = await fetch(`${API_URL}/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(userData),
+            });
+
+            const data = await response.json(); // Lấy dữ liệu phản hồi từ server
+
+            if (!response.ok) {
+                throw new Error(data.message || "Đăng ký thất bại!");
+            }
+
+            return data; // Trả về dữ liệu từ server nếu đăng ký thành công
         } catch (error: any) {
-          console.error("Lỗi đăng ký:", error.message);
-          throw new Error(error.message || "Lỗi hệ thống! Vui lòng thử lại.");
+            console.error("Lỗi đăng ký:", error.message);
+            throw new Error(error.message || "Lỗi hệ thống! Vui lòng thử lại.");
         }
-      },
+    },
 };
 
 export default authService;

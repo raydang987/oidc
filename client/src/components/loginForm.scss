@@ -62,20 +62,20 @@
       }
   
       &--primary {
-        background: #007bff;
-        color: white;
+        background: #1ce964;
+        color: rgb(14, 5, 5);
   
         &:hover {
-          background: #0056b3;
+          background: #1c934d;
         }
       }
   
       &--secondary {
-        background: #28a745;
-        color: white;
+        background: #20aaba;
+        color: rgb(22, 10, 10);
   
         &:hover {
-          background: #1e7e34;
+          background: #11659e;
         }
       }
     }
@@ -92,7 +92,7 @@
     transition: background-color 0.3s ease;
   
     &:hover {
-      background-color: #e0a800; // Màu vàng đậm hơn khi hover
+      background-color: #987c29; // Màu vàng đậm hơn khi hover
     }
   
     &:active {
