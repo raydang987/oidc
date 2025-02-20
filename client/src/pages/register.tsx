@@ -1,17 +1,16 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import authService from "../services/auth.service";
 import "./register.scss";
-import { userManager } from "../config/oidcConfig";
+import { useNavigate } from "react-router-dom";
 
 const RegisterForm: React.FC = () => {
-  const [account, setAccount] = useState("");
+  const [username, setAccount] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,17 +23,17 @@ const RegisterForm: React.FC = () => {
 
     setLoading(true);
     try {
-        const success = await authService.register({ account, email, password });
+        const success = await authService.register({ username, email, password });
         if (success) {
-            alert("Đăng ký thành công! Hệ thống sẽ đồng bộ với OIDC.");
-
+         //   alert("Đăng ký thành công! Hệ thống sẽ đồng bộ với OIDC.");
+            alert("Đăng ký thành công!");
             // Chuyển hướng đăng nhập OIDC
-            await userManager.signinRedirect();
+            navigate("/login");
         } else {
             setError("Đăng ký không thành công. Vui lòng thử lại!");
         }
-    } catch (err: any) {
-        setError(err?.response?.data?.message || "Lỗi hệ thống! Vui lòng thử lại.");
+    } catch  {
+        setError("Lỗi hệ thống! Vui lòng thử lại.");
     } finally {
         setLoading(false);
     }
@@ -49,7 +48,7 @@ const RegisterForm: React.FC = () => {
 
       <div className="register-form__group">
         <label>Tài khoản</label>
-        <input type="text" value={account} onChange={(e) => setAccount(e.target.value)} required />
+        <input type="text" value={username} onChange={(e) => setAccount(e.target.value)} required />
       </div>
 
       <div className="register-form__group">
