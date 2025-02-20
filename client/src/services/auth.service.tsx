@@ -1,17 +1,15 @@
 import axios from "axios";
 
-const API_URL = "https://localhost:3001/auth";
 import { userManager } from "../config/oidcConfig";
 const authService = {
-    async loginWithAccount(account: string, password: string) {
+    async loginWithAccount(username: string, password: string) {
         try {
-            const response = await axios.post(`${API_URL}/login`, {
-                account,
+            const response = await axios.post(`http://localhost:3001/api/auth/login`, {
+                username,
                 password,
             });
-
-            if (response.data.success) {
-                localStorage.setItem("access_token", response.data.token);
+            if (response.data) {
+                localStorage.setItem("access_token", response.data.access_token);
                 return true;
             } else {
                 throw new Error("Tài khoản hoặc mật khẩu không chính xác.");
@@ -134,9 +132,9 @@ const authService = {
     async getUser() {
         return await userManager.getUser(); // Lấy thông tin người dùng hiện tại
     },
-    async register(userData: { account: string; email: string; password: string }) {
+    async register(userData: { username: string; email: string; password: string }) {
         try {
-            const response = await fetch(`${API_URL}/register`, {
+            const response = await fetch(`http://localhost:3001/api/auth/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(userData),
@@ -149,10 +147,13 @@ const authService = {
             }
 
             return data; // Trả về dữ liệu từ server nếu đăng ký thành công
-        } catch (error: any) {
-            console.error("Lỗi đăng ký:", error.message);
-            throw new Error(error.message || "Lỗi hệ thống! Vui lòng thử lại.");
-        }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error("Lỗi đăng ký:", error.message);
+                throw new Error(error.message || "Lỗi hệ thống! Vui lòng thử lại.");
+            }
+            throw new Error("Lỗi không xác định!");
+        }        
     },
 };
 

@@ -83,14 +83,20 @@ export class UserService {
   }
 
   async update(id: string, updateDto: UpdateUserDto): Promise<UserDto | null> {
-    const [updatedRows] = await this.userModel.update(updateDto, {
-      where: { id },
-    });
-    if (updatedRows > 0) {
-      const updatedUser = await this.findOneById(id);
-      return updatedUser;
+    const user = await this.userModel.findByPk(id);
+    if (!user) {
+      throw new HttpException("User không tồn tại!", HttpStatus.NOT_FOUND);
     }
-    return null;
+
+    if (updateDto.password) {
+      updateDto.password = await this.authService.hashPassword(
+        updateDto.password
+      );
+    }
+
+    await user.update(updateDto);
+
+    return plainToInstance(UserDto, user, { excludeExtraneousValues: true });
   }
 
   async deleteById(id: string): Promise<boolean> {

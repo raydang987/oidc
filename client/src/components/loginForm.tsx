@@ -3,7 +3,7 @@ import authService from "../services/auth.service";
 import "./LoginForm.scss";
 import { useNavigate } from "react-router-dom";
 const LoginForm: React.FC = () => {
-  const [account, setAccount] = useState("");
+  const [username, setAccount] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -14,19 +14,21 @@ const LoginForm: React.FC = () => {
     setLoading(true);
 
     try {
-      const success = await authService.loginWithAccount(account, password);
+      const success = await authService.loginWithAccount(username, password);
       if (success) {
         alert("Đăng nhập thành công!");
         window.location.href = "/login-success";
       } else {
         setError("Tài khoản hoặc mật khẩu không chính xác.");
       }
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Lỗi hệ thống! Vui lòng thử lại.");
-    } finally {
-      setLoading(false);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Lỗi hệ thống! Vui lòng thử lại.");
+      }
     }
-  };
+  };    
 
   const handleTrisLogin = () => {
     authService.loginWithOIDC();
@@ -51,7 +53,7 @@ const LoginForm: React.FC = () => {
 
       <div className="login-form__group">
         <label>Tài khoản</label>
-        <input type="text" value={account} onChange={(e) => setAccount(e.target.value)} required />
+        <input type="text" value={username} onChange={(e) => setAccount(e.target.value)} required />
       </div>
 
       <div className="login-form__group">
