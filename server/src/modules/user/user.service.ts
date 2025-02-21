@@ -1,7 +1,9 @@
 import {
   ConflictException,
+  forwardRef,
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/sequelize";
@@ -18,7 +20,7 @@ import { Op } from "sequelize";
 export class UserService {
   constructor(
     @InjectModel(User) private userModel: typeof User,
-    private readonly authService: AuthService
+    @Inject(forwardRef(() => AuthService)) private authService: AuthService
   ) {}
 
   async findOrCreateUser(access_token: string): Promise<User> {
@@ -99,11 +101,19 @@ export class UserService {
     return plainToInstance(UserDto, user, { excludeExtraneousValues: true });
   }
 
+  async findByUsername(username: string): Promise<User | null> {
+    return this.userModel.findOne({ where: { username } });
+  }
+
   async deleteById(id: string): Promise<boolean> {
     const user = await this.userModel.findByPk(id);
     if (!user) return false;
     await user.destroy();
     return true;
+  }
+
+  async updateIdSub(userId: number, id_sub: string) {
+    return this.userModel.update({ id_sub }, { where: { id: userId } });
   }
 
   async register(
