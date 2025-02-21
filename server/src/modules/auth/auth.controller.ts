@@ -1,7 +1,15 @@
-import { Controller, Post, Body, BadRequestException } from "@nestjs/common";
+import {
+  Controller,
+  Post,
+  Body,
+  BadRequestException,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { UserService } from "../user/user.service";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { CreateUserDto } from "../user/dto/create-user.dto";
+import { LoginDto } from "./dto/login.dto";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -20,5 +28,26 @@ export class AuthController {
       throw new BadRequestException("Thiếu access_token trong request!");
     }
     return this.userService.findOrCreateUser(body.access_token);
+  }
+
+  @Post("register")
+  @ApiOperation({ summary: "Đăng ký tài khoản mới" })
+  async register(@Body() createUserDto: CreateUserDto) {
+    const result = await this.userService.register(createUserDto);
+    return {
+      success: true,
+      message: result.message,
+      data: result.user,
+    };
+  }
+
+  @Post("login")
+  @ApiOperation({ summary: "Đăng nhập và nhận JWT" })
+  async login(@Body() loginDto: LoginDto) {
+    const user = await this.userService.validateUser(loginDto);
+    if (!user) {
+      throw new UnauthorizedException("Sai thông tin đăng nhập");
+    }
+    return this.authService.generateJwt(user);
   }
 }

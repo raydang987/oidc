@@ -10,7 +10,9 @@ const RegisterForm: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate()
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -31,8 +33,8 @@ const RegisterForm: React.FC = () => {
         } else {
             setError("Đăng ký không thành công. Vui lòng thử lại!");
         }
-    } catch (err: any) {
-        setError(err?.response?.data?.message || "Lỗi hệ thống! Vui lòng thử lại.");
+    } catch  {
+        setError("Lỗi hệ thống! Vui lòng thử lại.");
     } finally {
         setLoading(false);
     }

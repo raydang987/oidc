@@ -21,12 +21,14 @@ const LoginForm: React.FC = () => {
       } else {
         setError("Tài khoản hoặc mật khẩu không chính xác.");
       }
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Lỗi hệ thống! Vui lòng thử lại.");
-    } finally {
-      setLoading(false);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Lỗi hệ thống! Vui lòng thử lại.");
+      }
     }
-  };
+  };    
 
   const handleTrisLogin = () => {
     authService.loginWithOIDC();
