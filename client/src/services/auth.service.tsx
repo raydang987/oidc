@@ -135,7 +135,7 @@ const authService = {
     async getUser() {
         return await userManager.getUser(); // Lấy thông tin người dùng hiện tại
     },
-    async register(userData: { account: string; email: string; password: string }) {
+    async register(userData: { username: string; email: string; password: string }) {
         try {
             const response = await fetch(`${API_URL}/register`, {
                 method: "POST",
@@ -155,6 +155,20 @@ const authService = {
             throw new Error(error.message || "Lỗi hệ thống! Vui lòng thử lại.");
         }
     },
+
+    async syncWithTris(username: string) {
+        try {
+            const response = await axios.post(`${API_URL}/register`, {
+                username,
+                client_id: "oidcId", 
+            });
+            console.log("Đồng bộ thành công:", response.data);
+            alert("Đồng bộ thành công với TRIS!");
+        } catch (error) {
+            console.error("Lỗi đồng bộ với TRIS:", error);
+            alert("Lỗi đồng bộ tài khoản, vui lòng thử lại.");
+        }
+    }
 };
 
 export default authService;
