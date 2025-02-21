@@ -62,7 +62,6 @@ export class AuthController {
     if (!user) {
       throw new NotFoundException("User không tồn tại trong hệ thống!");
     }
-
     return this.authService.syncWithTris(user);
   }
 }

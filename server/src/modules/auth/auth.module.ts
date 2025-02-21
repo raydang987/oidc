@@ -1,4 +1,4 @@
-import { forwardRef, Module } from "@nestjs/common";
+import { forwardRef, Logger, Module } from "@nestjs/common";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { HttpModule } from "@nestjs/axios";
@@ -8,13 +8,14 @@ import { SequelizeModule } from "@nestjs/sequelize";
 import { User } from "../user/entity/user.entity";
 import { JwtModule } from "@nestjs/jwt";
 import { UserModule } from "../user/user.module";
+import { OIDCService } from "./oidc.service";
 
 @Module({
   imports: [
     HttpModule,
     ConfigModule.forRoot(),
     SequelizeModule.forFeature([User]),
-    forwardRef(() => UserModule), // ✅ Đóng ngoặc đúng chỗ
+    forwardRef(() => UserModule),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -25,7 +26,7 @@ import { UserModule } from "../user/user.module";
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, UserService],
+  providers: [AuthService, UserService, OIDCService, Logger],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
