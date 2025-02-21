@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
 import { HttpModule } from "@nestjs/axios";
@@ -7,12 +7,14 @@ import { UserService } from "../user/user.service";
 import { SequelizeModule } from "@nestjs/sequelize";
 import { User } from "../user/entity/user.entity";
 import { JwtModule } from "@nestjs/jwt";
+import { UserModule } from "../user/user.module";
 
 @Module({
   imports: [
     HttpModule,
     ConfigModule.forRoot(),
     SequelizeModule.forFeature([User]),
+    forwardRef(() => UserModule), // ✅ Đóng ngoặc đúng chỗ
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

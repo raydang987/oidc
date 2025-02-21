@@ -4,6 +4,7 @@ import {
   Body,
   BadRequestException,
   UnauthorizedException,
+  NotFoundException,
 } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { UserService } from "../user/user.service";
@@ -49,5 +50,19 @@ export class AuthController {
       throw new UnauthorizedException("Sai thông tin đăng nhập");
     }
     return this.authService.generateJwt(user);
+  }
+
+  @Post("sync-to-tris")
+  @ApiOperation({ summary: "Đồng bộ tài khoản lên TRIS (OIDC)" })
+  async syncToTris(@Body() body: { username: string }) {
+    if (!body.username) {
+      throw new BadRequestException("Thiếu username trong request!");
+    }
+    const user = await this.userService.findByUsername(body.username);
+    if (!user) {
+      throw new NotFoundException("User không tồn tại trong hệ thống!");
+    }
+
+    return this.authService.syncWithTris(user);
   }
 }
