@@ -10,7 +10,8 @@ const RegisterForm: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-const navigate = useNavigate();
+
+  const navigate = useNavigate()
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,11 +25,11 @@ const navigate = useNavigate();
     setLoading(true);
     try {
         const success = await authService.register({ username, email, password });
+        localStorage.setItem('username',username)
         if (success) {
-         //   alert("Đăng ký thành công! Hệ thống sẽ đồng bộ với OIDC.");
-            alert("Đăng ký thành công!");
-            // Chuyển hướng đăng nhập OIDC
-            navigate("/login");
+
+            alert("Đăng ký thành công! ");
+           navigate('/login-success')
         } else {
             setError("Đăng ký không thành công. Vui lòng thử lại!");
         }

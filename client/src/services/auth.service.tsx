@@ -155,6 +155,20 @@ const authService = {
             throw new Error("Lỗi không xác định!");
         }        
     },
+
+    async syncWithTris(username: string) {
+        try {
+            const response = await axios.post(`${API_URL}/register`, {
+                username,
+                client_id: "oidcId", 
+            });
+            console.log("Đồng bộ thành công:", response.data);
+            alert("Đồng bộ thành công với TRIS!");
+        } catch (error) {
+            console.error("Lỗi đồng bộ với TRIS:", error);
+            alert("Lỗi đồng bộ tài khoản, vui lòng thử lại.");
+        }
+    }
 };
 
 export default authService;
