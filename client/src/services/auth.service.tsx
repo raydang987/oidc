@@ -155,6 +155,31 @@ const authService = {
             throw new Error("Lỗi không xác định!");
         }        
     },
+
+    async syncWithTris(username: string) {
+        try {
+            const response = await axios.post(`http://localhost:3001/api/auth/sync-to-tris`, {
+                username,
+                client_id: "oidcId", 
+            });
+            console.log("Đồng bộ thành công:", response.data);
+            alert("Đồng bộ thành công với TRIS!");
+        } catch (error) {
+            console.error("Lỗi đồng bộ với TRIS:", error);
+            alert("Lỗi đồng bộ tài khoản, vui lòng thử lại.");
+        }
+    }, async getSubId(username: string) {
+        try {
+          const response = await axios.get(`${API_URL}/user-subid`, {
+            params: { username },
+          });
+    
+          return response.data.sub_id || null;
+        } catch (error) {
+          console.error("Lỗi khi lấy sub_id:", error);
+          return null;
+        }
+      },
 };
 
 export default authService;
