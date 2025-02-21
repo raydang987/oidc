@@ -23,7 +23,7 @@ const RegisterForm: React.FC = () => {
     setLoading(true);
     try {
         const success = await authService.register({ username, email, password });
-        localStorage.setItem('username',username)
+        localStorage.setItem('username',success.data.username)
         if (success) {
 
             alert("Đăng ký thành công! ");
