@@ -158,7 +158,7 @@ const authService = {
 
     async syncWithTris(username: string) {
         try {
-            const response = await axios.post(`${API_URL}/register`, {
+            const response = await axios.post(`http://localhost:3001/api/auth/sync-to-tris`, {
                 username,
                 client_id: "oidcId", 
             });
